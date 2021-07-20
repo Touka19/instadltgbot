@@ -24,6 +24,7 @@ def start(update: Update, context: CallbackContext) -> None:
 def echo(update: Update, context: CallbackContext) -> None:
     """Echo the user message."""
     url = update.message.text
+    logger.info('Usuario %s ha pedido la URL %s', update.message.from_user.username, url)
     if not url.startswith('https://www.instagram.com/'):
         update.message.reply_text('Esto no es una URL de Instagram... 😕')
 
@@ -60,13 +61,9 @@ def echo(update: Update, context: CallbackContext) -> None:
             elif c['node']['__typename'] == 'GraphVideo':
                 content.append([c['node']['shortcode'], c['node']['video_url'], '.mp4'])
 
-
-
     #@TODO stories
     #if url.startswith('https://www.instagram.com/stories'):
     #   content = cont['graphql']['shortcode_media']['display_url']
-
-    #@TODO reels
 
     #Creamos un directorio para la descarga con la ID del chat con el usuario y el timestamp actual
     now = time.time()
@@ -80,6 +77,7 @@ def echo(update: Update, context: CallbackContext) -> None:
     for c in content: #Descargamos los archivos
         urllib.request.urlretrieve(c[1], path + '/' + str(owner + '_' + c[0] + c[2]))
         update.message.reply_document(document=open(path+'/'+str(owner+'_'+c[0]+c[2]), 'rb'))
+        logger.info('Enviado el archivo %s al usuario %s', str(owner+'_'+c[0]+c[2]), update.message.from_user.username)
 
     shutil.rmtree(path)
     return
@@ -99,8 +97,6 @@ def main() -> None:
     # on different commands - answer in Telegram
     dispatcher.add_handler(CommandHandler("start", start))
     dispatcher.add_handler(CommandHandler("help", start))
-
-    #@TODO user actions logger
 
     # on non command i.e message - echo the message on Telegram
     dispatcher.add_handler(MessageHandler(Filters.text & ~Filters.command, echo))
