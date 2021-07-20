@@ -52,7 +52,7 @@ def echo(update: Update, context: CallbackContext) -> None:
     if cont['graphql']['shortcode_media']['__typename'] == 'GraphImage':
         content.append([cont['graphql']['shortcode_media']['shortcode'], cont['graphql']['shortcode_media']['display_url'], '.jpg'])
     if cont['graphql']['shortcode_media']['__typename'] == 'GraphVideo':
-        content.append([cont['graphql']['shortcode_media']['shortcode'], cont['graphql']['shortcode_media']['video_url'], '.jpg'])
+        content.append([cont['graphql']['shortcode_media']['shortcode'], cont['graphql']['shortcode_media']['video_url'], '.mp4'])
     elif cont['graphql']['shortcode_media']['__typename'] == 'GraphSidecar':
         for c in cont['graphql']['shortcode_media']['edge_sidecar_to_children']['edges']:
             if c['node']['__typename'] == 'GraphImage':
