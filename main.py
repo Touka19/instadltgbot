@@ -18,7 +18,8 @@ logger = logging.getLogger(__name__)
 # context.
 def start(update: Update, context: CallbackContext) -> None:
     """Send a message when the command /start is issued."""
-    context.bot.send_message(chat_id=update.effective_chat.id, text='¡Hola! Con este bot puedes descargar contenido de Instagram. Simplemente envíame una URL de publicación de Instagram y te la enviaré como archivo para que la puedas guardar.')
+    context.bot.send_message(chat_id=update.effective_chat.id, text='¡Hola! 👋\nCon este bot puedes descargar contenido de Instagram. Simplemente envíame una URL de publicación de Instagram y te la enviaré como archivo para que la puedas guardar.')
+    update.message.reply_photo(photo=open('img/start_img.jpg', 'rb'), caption='En Instagram, pulsa el icono de tres puntos (⋮) y elige "Compartir en...", selecciona Telegram y envíamelo. También puedes copiar el enlace y enviármelo manualmente.')
 
 def echo(update: Update, context: CallbackContext) -> None:
     """Echo the user message."""
@@ -29,19 +30,20 @@ def echo(update: Update, context: CallbackContext) -> None:
     if not url.endswith('/'):
         url = url+'/'
 
+    # Detectamos si la URL es de un post
+    if not (url.startswith('https://www.instagram.com/p') or url.startswith('https://www.instagram.com/reel')):
+        update.message.reply_text('No hemos podido descargar contenido de esta URL. Revisa que sea correcta o contacta.')
+        return
 
     url = url.split('?', 1)
     url = url[0]
     url = url+'?__a=1'
-    print(url)
     req = urllib.request.Request(url, data=None, headers={'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_9_3) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/35.0.1916.47 Safari/537.36'})
     r = urllib.request.urlopen(req).read()
     cont = json.loads(r.decode('utf-8'))
 
     content = []
-    # Detectamos si la URL es de un post
-    if not url.startswith('https://www.instagram.com/p'):
-        update.message.reply_text('No hemos podido descargar contenido de esta URL. Revisa que sea correcta o contacta.')
+
 
     update.message.reply_text('Descargando...')
     owner = cont['graphql']['shortcode_media']['owner']['username']
@@ -62,6 +64,8 @@ def echo(update: Update, context: CallbackContext) -> None:
     #if url.startswith('https://www.instagram.com/stories'):
     #   content = cont['graphql']['shortcode_media']['display_url']
 
+    #@TODO reels
+
     #Creamos un directorio para la descarga con la ID del chat con el usuario y el timestamp actual
     now = time.time()
     #path = os.path.join(pathlib.Path(__file__).parent.resolve())
@@ -72,7 +76,6 @@ def echo(update: Update, context: CallbackContext) -> None:
         return
     update.message.reply_text('¡Ya está! Aquí lo tienes 😋')
     for c in content: #Descargamos los archivos
-        print(urllib.request.urlretrieve(c[1], path+'/'+str(owner+'_'+c[0]+c[2])))
         update.message.reply_document(document=open(path+'/'+str(owner+'_'+c[0]+c[2]), 'rb'))
 
     shutil.rmtree(path)
@@ -93,6 +96,8 @@ def main() -> None:
     # on different commands - answer in Telegram
     dispatcher.add_handler(CommandHandler("start", start))
     dispatcher.add_handler(CommandHandler("help", start))
+
+    #@TODO user actions logger
 
     # on non command i.e message - echo the message on Telegram
     dispatcher.add_handler(MessageHandler(Filters.text & ~Filters.command, echo))
