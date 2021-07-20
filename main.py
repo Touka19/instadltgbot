@@ -60,6 +60,8 @@ def echo(update: Update, context: CallbackContext) -> None:
             elif c['node']['__typename'] == 'GraphVideo':
                 content.append([c['node']['shortcode'], c['node']['video_url'], '.mp4'])
 
+
+
     #@TODO stories
     #if url.startswith('https://www.instagram.com/stories'):
     #   content = cont['graphql']['shortcode_media']['display_url']
@@ -76,6 +78,7 @@ def echo(update: Update, context: CallbackContext) -> None:
         return
     update.message.reply_text('¡Ya está! Aquí lo tienes 😋')
     for c in content: #Descargamos los archivos
+        urllib.request.urlretrieve(c[1], path + '/' + str(owner + '_' + c[0] + c[2]))
         update.message.reply_document(document=open(path+'/'+str(owner+'_'+c[0]+c[2]), 'rb'))
 
     shutil.rmtree(path)
