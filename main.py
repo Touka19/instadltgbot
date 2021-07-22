@@ -83,7 +83,7 @@ def echo(update: Update, context: CallbackContext) -> None:
     for c in content: #Descargamos los archivos
         urllib.request.urlretrieve(c[1], path + '/' + str(owner + '_' + c[0] + c[2]))
         update.message.reply_document(document=open(path+'/'+str(owner+'_'+c[0]+c[2]), 'rb'))
-        logger.info('Enviado el archivo %s al usuario %s', str(owner+'_'+c[0]+c[2]), update.message.from_user.username)
+        logger.info('\x1b[31;1mEnviado el archivo %s al usuario %s', str(owner+'_'+c[0]+c[2]), update.message.from_user.username)
 
     shutil.rmtree(path)
     return
@@ -94,7 +94,7 @@ def echo(update: Update, context: CallbackContext) -> None:
 
 def main() -> None:
     # Config read
-    with open('bot_api_key.json') as config_json:
+    with open('bot_config.json') as config_json:
         config_data = json.load(config_json)
 
     """Start the bot."""
