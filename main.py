@@ -10,9 +10,12 @@ from telegram.ext import Updater, CommandHandler, MessageHandler, Filters, Callb
 logging.basicConfig(
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s', level=logging.INFO
 )
-
 logger = logging.getLogger(__name__)
 
+
+def user_log(user_id: int):
+    return False
+    #@TODO Guardar la petición del usuario
 
 # Define a few command handlers. These usually take the two arguments update and
 # context.
@@ -20,11 +23,14 @@ def start(update: Update, context: CallbackContext) -> None:
     """Send a message when the command /start is issued."""
     context.bot.send_message(chat_id=update.effective_chat.id, text='¡Hola! 👋\nCon este bot puedes descargar contenido de Instagram. Simplemente envíame una URL de publicación de Instagram y te la enviaré como archivo para que la puedas guardar.')
     update.message.reply_photo(photo=open('img/start_img.jpg', 'rb'), caption='En Instagram, pulsa el icono de tres puntos (⋮) y elige "Compartir en...", selecciona Telegram y envíamelo. También puedes copiar el enlace y enviármelo manualmente.')
+    #@TODO Configuración para que el usuario elija si quiere las fotos como imágenes o como archivos
 
 def echo(update: Update, context: CallbackContext) -> None:
+    #@TODO Detección de perfil, post, reel. Cada uno irá a una función distinta
+    #Aquí solo se detectará el tipo de URL enviada (y si es o no de Instagram)
     """Echo the user message."""
     url = update.message.text
-    logger.info('Usuario %s ha pedido la URL %s', update.message.from_user.username, url)
+    logger.info('[USER] \t %s: %s', update.message.from_user.username, url)
     if not url.startswith('https://www.instagram.com/'):
         update.message.reply_text('Esto no es una URL de Instagram... 😕')
 
@@ -87,9 +93,13 @@ def echo(update: Update, context: CallbackContext) -> None:
 
 
 def main() -> None:
+    # Config read
+    with open('bot_api_key.json') as config_json:
+        config_data = json.load(config_json)
+
     """Start the bot."""
     # Create the Updater and pass it your bot's token.
-    updater = Updater("1808003385:AAHuFmH1Ham8sH41GNu0KaR65FVn5wD3yLc")
+    updater = Updater(config_data['API_key'])
 
     # Get the dispatcher to register handlers
     dispatcher = updater.dispatcher
