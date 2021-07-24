@@ -105,7 +105,7 @@ def echo(update: Update, context: CallbackContext) -> None:
         urllib.request.urlretrieve(c[1], path + '/' + str(owner + '_' + c[0] + c[2]))
         #update.message.reply_document(document=open(path+'/'+str(owner+'_'+c[0]+c[2]), 'rb'))
         update.message.reply_photo(photo=open(path+'/'+str(owner+'_'+c[0]+c[2]), 'rb'))
-        logger.info(colored('[BOT]', 'magenta', attrs=['bold']) + '\t\t '+colored('Enviado el archivo %s al usuario ', 'green')+colored('%s', 'yellow'), str(owner+'_'+c[0]+c[2]), update.message.from_user.username)
+        logger.info(colored('[BOT]', 'magenta', attrs=['bold']) + '\t\t '+colored('Enviada la imagen %s al usuario ', 'green')+colored('%s', 'yellow'), str(owner+'_'+c[0]+c[2]), update.message.from_user.username)
 
 
     shutil.rmtree(path)
