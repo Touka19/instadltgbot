@@ -1,9 +1,12 @@
-import logging, urllib.request, json, os, shutil
+import logging
+import urllib.request
+import json
+import os
+import shutil
 import time
+import db
 
-from datetime import datetime
 from telegram import Update, ForceReply
-from telegram.utils.request import Request
 from telegram.ext import Updater, CommandHandler, MessageHandler, Filters, CallbackContext
 from termcolor import colored
 from urllib.error import HTTPError
@@ -100,7 +103,8 @@ def echo(update: Update, context: CallbackContext) -> None:
     update.message.reply_text('¡Ya está! Aquí lo tienes 😋')
     for c in content: #Descargamos los archivos
         urllib.request.urlretrieve(c[1], path + '/' + str(owner + '_' + c[0] + c[2]))
-        update.message.reply_document(document=open(path+'/'+str(owner+'_'+c[0]+c[2]), 'rb'))
+        #update.message.reply_document(document=open(path+'/'+str(owner+'_'+c[0]+c[2]), 'rb'))
+        update.message.reply_photo(photo=open(path+'/'+str(owner+'_'+c[0]+c[2]), 'rb'))
         logger.info(colored('[BOT]', 'magenta', attrs=['bold']) + '\t\t '+colored('Enviado el archivo %s al usuario ', 'green')+colored('%s', 'yellow'), str(owner+'_'+c[0]+c[2]), update.message.from_user.username)
 
 
