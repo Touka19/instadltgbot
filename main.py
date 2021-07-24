@@ -6,6 +6,7 @@ from telegram import Update, ForceReply
 from telegram.utils.request import Request
 from telegram.ext import Updater, CommandHandler, MessageHandler, Filters, CallbackContext
 from termcolor import colored
+from urllib.error import HTTPError
 
 # Enable logging
 os.system('color')
@@ -50,17 +51,24 @@ def echo(update: Update, context: CallbackContext) -> None:
     url = url.split('?', 1)
     url = url[0]
     url = url+'?__a=1'
-    req = urllib.request.Request(url, data=None, headers={'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_9_3) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/35.0.1916.47 Safari/537.36'})
-    req = urllib.request.urlopen(req)
+    req = urllib.request.Request(url, data=None, headers={'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_9_4) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/35.0.1916.47 Safari/537.36'})
+    try:
+        r = urllib.request.urlopen(req)
+    except HTTPError as e:
+        logger.info(colored('[BOT]', 'magenta', attrs=['bold']) + ' \t\t ' + colored('%s [%s - %s]', 'red'), 'No se ha podido descargar la URL', url, 'HTTPError: '+str(e.code))
+        update.message.reply_text('No hemos podido descargar contenido de esta URL. Revisa que sea correcta o contacta.')
+        return
     #@TODO Control de errores si el código no es 200
     #print(req.getcode())
-    #return
-    r = req.read()
-    cont = json.loads(r.decode('utf-8'))
+    r = r.read()
+    try:
+        cont = json.loads(r.decode('utf-8'))
+    except json.decoder.JSONDecodeError as e:
+        logger.info(colored('[BOT]', 'magenta', attrs=['bold']) + ' \t\t ' + colored('%s [%s - %s]', 'red'), 'No se ha podido descargar la URL', url, 'JSONError: '+e.msg)
+        update.message.reply_text('No hemos podido descargar contenido de esta URL. Revisa que sea correcta o contacta.')
+        return
 
     content = []
-
-
     update.message.reply_text('Descargando...')
     owner = cont['graphql']['shortcode_media']['owner']['username']
     id = cont['graphql']['shortcode_media']['shortcode']
@@ -76,7 +84,7 @@ def echo(update: Update, context: CallbackContext) -> None:
             elif c['node']['__typename'] == 'GraphVideo':
                 content.append([c['node']['shortcode'], c['node']['video_url'], '.mp4'])
 
-    #@TODO stories
+    #@TODO stories - En principio imposible sin loguear
     #if url.startswith('https://www.instagram.com/stories'):
     #   content = cont['graphql']['shortcode_media']['display_url']
 
