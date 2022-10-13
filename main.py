@@ -53,7 +53,8 @@ def echo(update: Update, context: CallbackContext) -> None:
 
     url = url.split('?', 1)
     url = url[0]
-    url = url+'?__a=1'
+    #url = url+'?__a=1'
+    url = url+'?__a=1&__d=dis'
     req = urllib.request.Request(url, data=None, headers={'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_9_4) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/35.0.1916.47 Safari/537.36'})
     try:
         r = urllib.request.urlopen(req)
