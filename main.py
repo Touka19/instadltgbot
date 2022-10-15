@@ -122,12 +122,11 @@ def echo(update: Update, context: CallbackContext) -> None:
 
 def main() -> None:
     # Config read
-    with open('bot_config.json') as config_json:
-        config_data = json.load(config_json)
+    config_data = os.environ.get("BOT_T")
 
     """Start the bot."""
     # Create the Updater and pass it your bot's token.
-    updater = Updater(config_data['API_key'])
+    updater = Updater(config_data)
 
     # Get the dispatcher to register handlers
     dispatcher = updater.dispatcher
